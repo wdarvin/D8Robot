@@ -24,14 +24,8 @@ double getAngle(double fx, double fy)	{
 		angle = -acos(dx/distance)*RADTODEG;
 	}
 	
-<<<<<<< HEAD
-	return (angle+90)%360;
-=======
 	//adjust for offset of course angle
 	//returns the angle for the heading
-	return (angle+90);
->>>>>>> origin/master
+	return (angle+90)%360;
+	
 }
-	
-	
-	
