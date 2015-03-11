@@ -1,5 +1,5 @@
-#import <cmath>
-#DEFINE RADTODEG 57.2957795
+#include <math.h>
+#define RADTODEG 57.2957795
 double getAngle(double fx, double fy)	{
 	double sx, sy, distance, angle, dx, dy, radicand;
 	
@@ -20,7 +20,7 @@ double getAngle(double fx, double fy)	{
 		angle = -acos(dx/distance)*RADTODEG;
 	}
 	
-	return angle;
+	return (angle+90)%360;
 }
 	
 	
