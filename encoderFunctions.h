@@ -89,9 +89,35 @@ void pulseForward(int percent, int counts, int timeout)
 	lMotor.Stop();
 }
 
+//pulse right with the sleep function
+void sleepRight(int percent)
+{
+	//set both motors to the desired percent
+	rMotor.SetPercent(percent);
+	lMotor.SetPercent(-percent);
+	
+	Sleep(30);
+	
+	rMotor.Stop();
+	lMotor.Stop();
+}
+
+//pulse left with the sleep function
+void sleepLeft(int percent)
+{
+	//set both motors to the desired percent
+	rMotor.SetPercent(-percent);
+	lMotor.SetPercent(percent);
+	
+	Sleep(30);
+	
+	rMotor.Stop();
+	lMotor.Stop();
+}
+
 //pulse left measuring using encoders
 //for use withen the rpsTurn command
-void pulseLeft(int percent, int counts)
+void pulseLeft(int percent, int counts, int timeout)
 {
 	time.tic();
 	//Rest encoder counts
@@ -112,7 +138,7 @@ void pulseLeft(int percent, int counts)
 
 //pulse right measuring using encoders
 //for use withen the rpsTurn command
-void pulseRight(int percent, int counts)
+void pulseRight(int percent, int counts, int timeout)
 {
 	time.tic();
 	//Rest encoder counts
@@ -238,12 +264,14 @@ void rpsTurn(float heading)
 		if(RPS.Heading() > heading)
 		{
 			//pulse the motors for a short duration in the correct direction
-			pulseRight(TURNPOWER,COUNTS,TIMEOUT);
+			sleepRight(TURNPOWER);
+			//pulseRight(TURNPOWER,COUNTS,TIMEOUT);
 			LCD.WriteLine("HEADING CHECK RIGHT");
 		}
 		else if(RPS.Heading() < heading)
 		{
-			pulseLeft(TURNPOWER,COUNTS,TIMEOUT);
+			sleepLeft(TURNPOWER);
+			//pulseLeft(TURNPOWER,COUNTS,TIMEOUT);
 			LCD.WriteLine("HEADING CHECK LEFT");
       }
       count++:
