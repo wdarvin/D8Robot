@@ -30,6 +30,38 @@ FEHServo ForkAngle (FEHServo::Servo0);
 
 Time time;
 
+//demo code for showing functions to kids and best engineered judges
+void runDemo()
+{
+	while(true)
+	{
+		if (buttons.RightPressed())
+		{
+			ForkAngle.SetDegree(180);
+		}
+		if (buttons.LeftPressed())
+		{
+			ForkAngle.SetDegree(0);
+		}
+		if (buttons.MiddlePressed())
+		{
+			ForkAngle.SetDegree(90);
+		}
+		if (buttons.MiddlePressed() && buttons.LeftPressed())
+		{
+			ForkHeight.SetPercent(30);
+			Sleep(.5);
+			ForkHeight.Stop();
+		}
+		if (buttons.MiddlePressed() && buttons.RightPressed())
+		{
+			ForkHeight.SetPercent(-30);
+			Sleep(.5);
+			ForkHeight.Stop();
+		}
+	} 
+}
+
 //returns an int with button order
 void getOrder(char order)
 {
