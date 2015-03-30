@@ -6,64 +6,53 @@
 #include <FEHRPS.h>
 #include "Time.h"
 
-#define POWER 10
-#define TURNPOWER 10
-#define COUNTS 5
-#define LINEACC .5
-#define TURNACC .5
-#define TIMEOUT 10
-
 //initialization statements
 //initialization statements
 ButtonBoard buttons(FEHIO::Bank3);
 
 DigitalEncoder rEncoder(FEHIO::P2_0);
 DigitalEncoder lEncoder(FEHIO::P2_1);
-
-AnalogInputPin CdS (FEHIO::P0_0);
+AnalogInputPin CdS (FEHIO::P2_4);
 
 FEHMotor ForkHeight (FEHMotor::Motor0);
 FEHMotor rMotor(FEHMotor::Motor2);
 FEHMotor lMotor(FEHMotor::Motor3);
 
-FEHServo ForkAngle (FEHServo::Servo0);
+FEHServo ForkAngle (FEHServo::Servo7);
 
 Time time;
 
-//demo code for showing functions to kids and best engineered judges
-void runDemo()
+void Demo()
 {
-	while(true)
-	{
-		if (buttons.RightPressed())
-		{
-			ForkAngle.SetDegree(180);
-		}
-		if (buttons.LeftPressed())
-		{
-			ForkAngle.SetDegree(0);
-		}
-		if (buttons.MiddlePressed())
-		{
-			ForkAngle.SetDegree(90);
-		}
-		if (buttons.MiddlePressed() && buttons.LeftPressed())
-		{
-			ForkHeight.SetPercent(30);
-			Sleep(.5);
-			ForkHeight.Stop();
-		}
-		if (buttons.MiddlePressed() && buttons.RightPressed())
-		{
-			ForkHeight.SetPercent(-30);
-			Sleep(.5);
-			ForkHeight.Stop();
-		}
-	} 
+
+while(true) {
+    if (buttons.RightPressed()) {
+        ForkAngle.SetDegree(180);
+    }
+    if (buttons.LeftPressed()) {
+        ForkAngle.SetDegree(0);
+    }
+    if (buttons.MiddlePressed()) {
+        ForkAngle.SetDegree(90);
+    }
+    if (buttons.MiddlePressed() && buttons.LeftPressed()) {
+        ForkHeight.SetPercent(30);
+        Sleep(.5);
+        ForkHeight.Stop();
+    }
+    if (buttons.MiddlePressed() && buttons.RightPressed()) {
+        ForkHeight.SetPercent(-30);
+        Sleep(.5);
+        ForkHeight.Stop();
+    }
 }
 
+}
+
+
+
 //returns an int with button order
-void getOrder(char order)
+void getOrder(char order[])
 {
 	int red = RPS.RedButtonOrder();
 	int blue = RPS.BlueButtonOrder();
@@ -71,7 +60,7 @@ void getOrder(char order)
 
 
     order[red-1] = 'R';
-    order[blue-1] = 'B'
+    order[blue-1] = 'B';
     order[white-1] = 'W';
 }
 
@@ -92,19 +81,20 @@ int encodeLength(float dist)
 }
 
 //wait until the light changes to start the course
-void waitForLightChange()
+void waitForLightChange(float cds)
 {
     LCD.WriteLine("WAITING");
-    while(CdS.Value()>.6);
+    while(CdS.Value() > cds) {
+        LCD.WriteLine(CdS.Value());
+    }
     LCD.WriteLine("LIGHT CHANGE");
 }
 
 
 //pulse forward measuring using encoders
 //for use withen the rpsForward command
-void pulseForward(int percent, int counts, int timeout)
+void pulseForward(int percent, int counts, double timeout)
 {
-	time.tic();
 	//Rest encoder counts
 	rEncoder.ResetCounts();
 	lEncoder.ResetCounts();
@@ -114,44 +104,43 @@ void pulseForward(int percent, int counts, int timeout)
 	lMotor.SetPercent(percent);
 	
 	//move each motor forward the expected number of counts
-	while((lEncoder.Counts()+rEncoder.Counts()) < counts*2 && time.toc()<timeout);
+    time.tic();
+    while((lEncoder.Counts() + rEncoder.Counts()) / 2. < counts && time.toc() < timeout)
+    {    }
 	
 	//turn motors off
 	rMotor.Stop();
 	lMotor.Stop();
 }
 
-//pulse right with the sleep function
-void sleepRight(int percent)
-{
-	//set both motors to the desired percent
-	rMotor.SetPercent(percent);
-	lMotor.SetPercent(-percent);
-	
-	Sleep(30);
-	
-	rMotor.Stop();
-	lMotor.Stop();
-}
-
-//pulse left with the sleep function
+//pulse left with sleep method
 void sleepLeft(int percent)
 {
-	//set both motors to the desired percent
-	rMotor.SetPercent(-percent);
-	lMotor.SetPercent(percent);
-	
-	Sleep(30);
-	
-	rMotor.Stop();
-	lMotor.Stop();
+    rMotor.SetPercent(percent);
+    lMotor.SetPercent(-percent);
+
+    Sleep(25);
+
+    rMotor.Stop();
+    lMotor.Stop();
+}
+
+//pulse left with sleep method
+void sleepRight(int percent)
+{
+    rMotor.SetPercent(-percent);
+    lMotor.SetPercent(percent);
+
+    Sleep(25);
+
+    rMotor.Stop();
+    lMotor.Stop();
 }
 
 //pulse left measuring using encoders
 //for use withen the rpsTurn command
-void pulseLeft(int percent, int counts, int timeout)
+void pulseLeft(int percent, int counts, double timeout)
 {
-	time.tic();
 	//Rest encoder counts
 	rEncoder.ResetCounts();
 	lEncoder.ResetCounts();
@@ -161,7 +150,12 @@ void pulseLeft(int percent, int counts, int timeout)
 	lMotor.SetPercent(-percent);
 	
 	//move each motor forward the expected number of counts
-	while((lEncoder.Counts()+rEncoder.Counts()) < counts*2 && time.toc()<timeout);
+    time.tic();
+    while((lEncoder.Counts() + rEncoder.Counts()) / 2. < counts && time.toc()  < timeout)
+    {
+
+    }
+
 
 	//turn motors off
 	rMotor.Stop();
@@ -170,9 +164,8 @@ void pulseLeft(int percent, int counts, int timeout)
 
 //pulse right measuring using encoders
 //for use withen the rpsTurn command
-void pulseRight(int percent, int counts, int timeout)
+void pulseRight(int percent, int counts, double timeout)
 {
-	time.tic();
 	//Rest encoder counts
 	rEncoder.ResetCounts();
 	lEncoder.ResetCounts();
@@ -182,7 +175,11 @@ void pulseRight(int percent, int counts, int timeout)
 	lMotor.SetPercent(percent);
 	
 	//move each motor forward the expected number of counts
-	while((lEncoder.Counts()+rEncoder.Counts()) < counts*2 && time.toc()<timeout);
+    time.tic();
+    while((lEncoder.Counts() + rEncoder.Counts()) / 2. < counts && time.toc() < timeout)
+    {
+    }
+
 
 	//turn motors off
 	rMotor.Stop();
@@ -200,13 +197,13 @@ void rpsXPlus(float x_coordinate)
         if(RPS.X() > x_coordinate)
         {
         //pulse the motors for a short duration in the correct direction
-        pulseForward(-POWER,COUNTS,TIMEOUT);
+        pulseForward(POWER,COUNTS,TIMEOUT);
         LCD.WriteLine("CHECK BACK");
         }
         else if(RPS.X() < x_coordinate)
         {
         //pulse the motors for a short duration in the correct direction
-        pulseForward(POWER,COUNTS,TIMEOUT);
+        pulseForward(-POWER,COUNTS,TIMEOUT);
         LCD.WriteLine("CHECK FORWARD");
         }
         count++;
@@ -224,13 +221,13 @@ void rpsXMinus(float x_coordinate)
     		if(RPS.X() > x_coordinate)
         {
         //pulse the motors for a short duration in the correct direction
-        pulseForward(POWER,COUNTS,TIMEOUT);
+        pulseForward(-POWER,COUNTS,TIMEOUT);
         LCD.WriteLine("CHECK BACK");
         }
         else if(RPS.X() < x_coordinate)
         {
         //pulse the motors for a short duration in the correct direction
-        pulseForward(-POWER,COUNTS,TIMEOUT);
+        pulseForward(POWER,COUNTS,TIMEOUT);
         LCD.WriteLine("CHECK FORWARD");
         }
         count++;
@@ -249,13 +246,13 @@ void rpsYMinus(float y_coordinate)
         if(RPS.Y() > y_coordinate)
         {
         //pulse the motors for a short duration in the correct direction
-        pulseForward(POWER,COUNTS,TIMEOUT);
+        pulseForward(-POWER,COUNTS,TIMEOUT);
         LCD.WriteLine("CHECK BACK");
         }
         else if(RPS.Y() < y_coordinate)
         {
         //pulse the motors for a short duration in the correct direction
-        pulseForward(-POWER,COUNTS,TIMEOUT);
+        pulseForward(POWER,COUNTS,TIMEOUT);
         LCD.WriteLine("CHECK FORWARD");
         }
         count++;
@@ -272,13 +269,13 @@ void rpsYPlus(float y_coordinate)
         if(RPS.Y() > y_coordinate)
         {
         //pulse the motors for a short duration in the correct direction
-        pulseForward(-POWER,COUNTS,TIMEOUT);
+        pulseForward(POWER,COUNTS,TIMEOUT);
         LCD.WriteLine("CHECK BACK");
         }
         else if(RPS.Y() < y_coordinate)
         {
         //pulse the motors for a short duration in the correct direction
-        pulseForward(POWER,COUNTS,TIMEOUT);
+        pulseForward(-POWER,COUNTS,TIMEOUT);
         LCD.WriteLine("CHECK FORWARD");
         }
         count++;
@@ -289,23 +286,47 @@ void rpsYPlus(float y_coordinate)
 //turn using rps and turn subfunctions
 void rpsTurn(float heading)
 {
-	int count = 0;
-	while(RPS.Heading() < heading - TURNACC || RPS.Heading() > heading + TURNACC)
-	{
-		LCD.Write(count);
-		if(RPS.Heading() > heading)
-		{
-			//pulse the motors for a short duration in the correct direction
-			sleepRight(TURNPOWER);
-			//pulseRight(TURNPOWER,COUNTS,TIMEOUT);
-			LCD.WriteLine("HEADING CHECK RIGHT");
-		}
-		else if(RPS.Heading() < heading)
-		{
-			sleepLeft(TURNPOWER);
-			//pulseLeft(TURNPOWER,COUNTS,TIMEOUT);
-			LCD.WriteLine("HEADING CHECK LEFT");
+
+    int count = 10;
+
+    while(RPS.Heading() < heading - TURNACC || RPS.Heading() > heading + TURNACC)
+    {
+        LCD.Write(count);
+        if(RPS.Heading() > heading)
+        {
+            //pulse the motors for a short duration in the correct direction
+            sleepRight(TURNPOWER);
+            //pulseRight(TURNPOWER,count,TIMEOUT);
+            LCD.WriteLine("HEADING CHECK RIGHT");
+        }
+        else if(RPS.Heading() < heading)
+        {
+            sleepLeft(TURNPOWER);
+            //pulseLeft(TURNPOWER,count,TIMEOUT);
+            LCD.WriteLine("HEADING CHECK LEFT");
       }
-      count++:
-   } 
+
+        if (count > 3)  {
+            count--;
+        }
+    }
+}
+
+void rpsTurnTo0() {
+while(RPS.Heading() < 0 || RPS.Heading() > 1.)
+{
+    if(RPS.Heading() < 180)
+    {
+       //pulse the motors for a short duration in the correct direction
+       sleepRight(TURNPOWER);
+       //pulseRight(TURNPOWER,count,TIMEOUT);
+       LCD.WriteLine("HEADING CHECK RIGHT");
+    }
+    else if(RPS.Heading() > 180)
+    {
+       sleepLeft(TURNPOWER);
+       //pulseLeft(TURNPOWER,count,TIMEOUT);
+       LCD.WriteLine("HEADING CHECK LEFT");
+    }
+}
 }

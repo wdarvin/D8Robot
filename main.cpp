@@ -1,39 +1,38 @@
+#include "Defines.h"
 #include "encoderFunctions.h"
+#include "getAngle.h"
+#include "Saltbag.h"
+#include "Buttonpress.h"
+#include "Crank.h"
+#include "Oilpump.h"
 
-#define MPOWER -30
+int main(){
 
-//main method for performance test 2
-int main()
-{
+    LCD.Clear();
+    float cds1 = .7;
+
+    ForkAngle.SetMin(500);
+    ForkAngle.SetMax(2500);
+
+    ForkAngle.SetDegree(100);
+
+
+    while(!(buttons.MiddlePressed()) ) {
+    LCD.Write("CdS Value: ");
+    LCD.WriteLine(CdS.Value());
+    Sleep(.2);
+    LCD.Clear();
+    }
+
+
+    Sleep(1.);
+//    Demo();
+
     RPS.InitializeMenu();
-    int order = getOrder();
+    waitForLightChange( cds1 );
 
-    LCD.WriteLine(order);
-	
-    while(!buttons.MiddlePressed())
-	{
-        if(allButtonsPressed())
-		{
-			LCD.WriteLine("ALL PRESSED");
-		}
-	}
-	
-
-    //RPS.InitializeMenu();
-    waitForLightChange();
-
-    pulseForward(MPOWER,encodeLength(13));
-    //rpsYMinus(18.5);
-
-    pulseLeft(20,200);
-    //rpsTurn(90);
-
-    pulseForward(MPOWER,encodeLength(12));
-    //rpsXPlus(29.3);
-
-    pulseLeft(20,200);
-    //rpsTurn(180);
-
-    pulseForward(MPOWER,encodeLength(60));
-    //rpsYPlus(65);
+    saltbag();
+    buttonpress();
+    crank();
+    oilpump();
 }

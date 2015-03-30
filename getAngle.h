@@ -1,5 +1,4 @@
-#include <math.h>
-#define RADTODEG 57.2957795
+
 double getAngle(double fx, double fy)	{
 	
 	//Variable declaring
@@ -12,8 +11,8 @@ double getAngle(double fx, double fy)	{
 	dy = fy-sy;
 	
 	//calculations for finding the angle to plug into arccos
-	radicand = pow(dx,2) + pow(dy, 2);
-	distance = sqrt(radicand);
+    radicand = pow(dx,2) + pow(dy, 2);
+    distance = sqrt(radicand);
 	
 	//finding angle using arccos function and distance from object and robot
 	if (dy >= 0)	{
@@ -26,6 +25,8 @@ double getAngle(double fx, double fy)	{
 	
 	//adjust for offset of course angle
 	//returns the angle for the heading
-	return (angle+90)%360;
-	
+    return (angle+90);
 }
+	
+	
+	
