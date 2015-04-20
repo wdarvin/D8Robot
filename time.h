@@ -1,4 +1,7 @@
-
+/**
+* Class Time used for timeout functionality
+*
+**/
 class Time
 { 
 
@@ -7,16 +10,18 @@ class Time
 
 	public:
 	void tic();
-    double toc();
+   double toc();
 
 	
 };
-	
+
+//Updates private variable start to now
 void Time::tic()
 {
     start = TimeNow();
 }
 
+//Returns time since tic() called;
 double Time::toc()
 {
     return TimeNow() - start;

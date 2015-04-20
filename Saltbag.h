@@ -1,104 +1,75 @@
 
-void saltbag() {
+void saltbag(float bagx, float bagheading, float bagy) {
     //SALT BAG CODE
-//    //Beginning of ramp code
-//    //Position the robot to be able to run straight into the salt bag
-//    rpsYMinus(14.);
-//    pulseRight(TPOWER, 200, TIMEOUT1);
-//    rpsTurn(270);
-//    LCD.WriteLine(RPS.Heading());
-//    Sleep(.5);
-//    rpsTurn(270);
-//    LCD.WriteLine(RPS.Heading());
-//    rpsXMinus(24.);
-
-//    //turn to face the saltbag
-//    rpsTurn(getAngle(7.8,29.7))
-
-
     //Go forward 10 inches
-    pulseForward(-MPOWER, encodeLength(10.), TIMEOUT5);
+    pulseForward(-MPOWER, encodeLength(15.), TIMEOUT5);
 
     //Position the robot to be able to run straight into the salt bag
-    rpsYPlus(13.5);
+    rpsYPlus(bagy);
     pulseLeft(TPOWER, TURN90COUNTS, TIMEOUT2);
     rpsTurn(270);
-    pulseForward(-MPOWER, encodeLength(2), TIMEOUT2);
-    rpsXMinus(24.5);
+    pulseForward(-MPOWER, encodeLength(3), TIMEOUT2);
+    rpsXMinus(bagx);
 
     //turn to face the saltbag
-    rpsTurn(getAngle(7.8,29.7));
-
+    pulseRight(TPOWER, TURN45COUNTS, TIMEOUT2);
+    rpsTurn(bagheading);
+    
     //move forward and have salt bag slide on to the fork
-    pulseForward((-MPOWER), encodeLength(4.), TIMEOUT2);
+    pulseForward(-MPOWER, encodeLength(2.5), TIMEOUT2);
 
     //turn to face the saltbag
-    rpsTurn(getAngle(7.8,29.7));
-
+    rpsTurn(bagheading);
 
     //Lower fork to get under the bag
-    ForkHeight.SetPercent((-SPOWER)-10);
-    Sleep(.4);
-    ForkHeight.Stop();
+    ForkLiftHeightEncode(-15, 3);
 
     //move forward and have salt bag slide on to the fork
-    pulseForward((-MPOWER)+ 10, encodeLength(4.), TIMEOUT2);
+    pulseForward((-MPOWER) + 5, encodeLength(4.5), TIMEOUT2);
+
+    //last try to get the saltbag
+    pulseForward((-MPOWER) + 5, encodeLength(2.5), TIMEOUT1);
 
     //move backward with salt bag on there
-    pulseForward(MPOWER, encodeLength(1.), TIMEOUT2);
+    pulseForward(MPOWER, encodeLength(.5), TIMEOUT1);
+    pulseLeft(TPOWER, 10, TIMEOUT1);
 
-    //turn to face the saltbag
-    rpsTurn(getAngle(7.8,29.7));
-
-//    rpsYMinus(9.);
+    //move backward with salt bag on there
+    pulseForward(MPOWER, encodeLength(1.), TIMEOUT1);
 
     //Lift fork with salt bag hopefully
-    ForkHeight.SetPercent(SPOWER);
-    Sleep(2.3);
-    ForkHeight.Stop();
+    ForkLiftHeightEncode(SPOWER, 16);
 
     //go backwards with the salt bag
-    pulseForward(MPOWER + 15, encodeLength(8.), TIMEOUT5);
-    pulseRight(TPOWERPOSTBAG, TURN45COUNTS, TIMEOUT);
-    rpsTurn(180);
-    rpsYPlus(16.);
+    pulseForward(MPOWER + 15, encodeLength(9.), TIMEOUT5);
 
     //turn to move towards wall
-    pulseRight(TPOWERPOSTBAG, TURN90COUNTS, TIMEOUT2);
+    pulseRight(TPOWERPOSTBAG, (TURN90COUNTS + TURN45COUNTS), TIMEOUT5);
     rpsTurn(90);
 
-    pulseForward(MPOWER, encodeLength(5.), TIMEOUT2);
+    //set both motors to the desired percent and run into the wall until the microswitch it pressed
+    rMotor.SetPercent(-20);
+    lMotor.SetPercent(-20);
+
+    time.tic();
+    while(Microswitch.Value() == 1 && time.toc() < TIMEOUT5)
+    {}
+
+    //turn motors off
+    rMotor.Stop();
+    lMotor.Stop();
+
+    pulseForward(-MPOWER, encodeLength(2.7), TIMEOUT1);
     //go towards the side wall to go up the ramp
-    rpsXPlus(27.6);
 
     pulseRight(TPOWERPOSTBAG, TURN90COUNTS, TIMEOUT2);
+    
     //Check angle before going up ramp
-
-
     rpsTurnTo0();
-//        while(RPS.Heading() < 1.75 || RPS.Heading() > 2.5)
-//        {
-//            if(RPS.Heading() < 180)
-//            {
-//                //pulse the motors for a short duration in the correct direction
-//                sleepRight(TURNPOWER);
-//                //pulseRight(TURNPOWER,count,TIMEOUT);
-//                LCD.WriteLine("HEADING CHECK RIGHT");
-//            }
-//            else if(RPS.Heading() > 180)
-//            {
-//                sleepLeft(TURNPOWER);
-//                //pulseLeft(TURNPOWER,count,TIMEOUT);
-//                LCD.WriteLine("HEADING CHECK LEFT");
-//          }
-//}
 
-
-    LCD.Write("Angle: ");
-    LCD.WriteLine(RPS.Heading());
 
     //Move forward to get up the ramp
-    pulseForward((-MPOWER)+10,encodeLength(28.), TIMEOUT + 5);
+    pulseForward((-MPOWER), encodeLength(29.), TIMEOUT + 5);
     //Check the Y position
     rpsYMinus(53.);
 
@@ -107,40 +78,41 @@ void saltbag() {
     rpsTurn(90);
 
     //push snow out of the way
-    pulseForward(-MPOWER, encodeLength(16.), TIMEOUT5);
-    rpsXPlus(7.);
+    pulseForward(20, encodeLength(18.), TIMEOUT5);
+    rpsXPlus(6.7);
 
     //position robot to go into garage
-    pulseForward(MPOWER + 5, encodeLength(2.), TIMEOUT2);
-    rpsXPlus(10.);
+    pulseForward(MPOWER , encodeLength(2.), TIMEOUT2);
+    rpsXPlus(9.0);
 
     //turn robot to face garage
+    pulseRight(TPOWERPOSTBAG, TURN45COUNTS, TIMEOUT2);
     rpsTurn(45);
     rpsTurn(45);
+
+
     //lower fork to fit in the garage
-    ForkHeight.SetPercent((-SPOWER)-10);
-    Sleep(1.8);
-    ForkHeight.Stop();
+    ForkLiftHeightEncode(-SPOWER, 8);
+
 
     //go forward to drop saltbag in garage
-    pulseForward(-MPOWER, encodeLength(9.), TIMEOUT3);
+    pulseForward(-MPOWER, encodeLength(7.), TIMEOUT2);
 
     //angle fork to drop saltbag
     ForkAngle.SetDegree(0);
+    Sleep(.75);
 
     //go backwards out of the garage
-    pulseForward(MPOWER, encodeLength(10.), TIMEOUT5);
-    //lift fork to slide it off the top of the garage
-    ForkAngle.SetDegree(90);
-
+    pulseForward(MPOWER, encodeLength(9.), TIMEOUT3);
+    //lift fork to slide it off the top of the garage (HELLO BOYS ;))
+    ForkAngle.SetDegree(100);
+    Sleep(.5);
 
     //Lower fork to push bag again
-    ForkHeight.SetPercent((-SPOWER)-10);
-    Sleep(.8);
-    ForkHeight.Stop();
+    ForkLiftHeightEncode(-SPOWER, 4);
 
     //go forwards into the garage
-    pulseForward(-MPOWER, encodeLength(11.), TIMEOUT5);
+    pulseForward(-MPOWER, encodeLength(9.), TIMEOUT2);
     //go backwards out of the garage
-    pulseForward(MPOWER, encodeLength(10.), TIMEOUT5);
+    pulseForward(MPOWER, encodeLength(8.), TIMEOUT3);
 }
